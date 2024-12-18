@@ -1,56 +1,155 @@
-/* Custom styles */
+/* Global Styles */
+:root {
+    --primary-color: #0088ff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #f5f5f5;
 }
 
-.navbar {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* Hero Section */
+.hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../assets/images/hero-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 100px 0;
+    margin-bottom: 40px;
 }
 
-.card {
-    border: none;
+/* Search Form */
+.search-box {
+    background: white;
+    padding: 30px;
     border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    margin-top: -50px;
+    position: relative;
+    z-index: 1;
+}
+
+.search-form .form-label {
+    font-weight: 600;
+    color: #333;
+}
+
+.search-form .form-control,
+.search-form .form-select {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.search-form .form-control:focus,
+.search-form .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 136, 255, 0.25);
+}
+
+/* Flight Cards */
+.flight-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s;
 }
 
-.card:hover {
+.flight-card:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.btn-primary {
-    padding: 8px 20px;
-    border-radius: 5px;
+.airline-logo {
+    max-height: 40px;
+    object-fit: contain;
 }
 
-/* Hero section styles */
-.bg-primary {
-    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+.flight-time {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
 }
 
-/* Form styles */
-.form-control, .form-select {
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #dee2e6;
+.flight-duration {
+    color: #666;
+    font-size: 0.9rem;
+    position: relative;
 }
 
-.form-control:focus, .form-select:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+.flight-duration::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    border-top: 1px dashed #ccc;
+    z-index: -1;
 }
 
-/* Search results styles */
-.flight-card {
+.flight-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* Features Section */
+.feature-card {
+    text-align: center;
+    padding: 30px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 100%;
+    transition: transform 0.2s;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
     margin-bottom: 15px;
+    color: #333;
 }
 
-/* Responsive adjustments */
+/* Responsive Design */
 @media (max-width: 768px) {
-    .container {
-        padding: 0 15px;
+    .hero {
+        padding: 60px 0;
     }
     
-    .card-body {
+    .search-box {
+        margin-top: -30px;
+        padding: 20px;
+    }
+    
+    .flight-card {
         padding: 15px;
+    }
+    
+    .flight-time {
+        font-size: 1rem;
+    }
+    
+    .flight-price {
+        font-size: 1.2rem;
     }
 }

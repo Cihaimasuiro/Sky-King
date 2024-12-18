@@ -1,53 +1,43 @@
-USE uasbasisdata;
+USE db_clahstra;
 
--- Insert data ke tabel Customer
-INSERT INTO Customer (nama, email, username, password, no_pasport) VALUES
-('John Doe', 'john.doe@email.com', 'johndoe', SHA2('password123', 256), 'A12345678'),
-('Jane Smith', 'jane.smith@email.com', 'janesmith', SHA2('password456', 256), 'B23456789'),
-('Ahmad Ibrahim', 'ahmad.ibrahim@email.com', 'ahmad', SHA2('password789', 256), 'C34567890'),
-('Maria Garcia', 'maria.garcia@email.com', 'maria', SHA2('passwordabc', 256), 'D45678901'),
-('Budi Santoso', 'budi.santoso@email.com', 'budi', SHA2('passworddef', 256), 'E56789012');
+-- Level Data
+INSERT INTO level (level_id, level_name) VALUES
+(1, 'admin'),
+(2, 'customer');
 
--- Alter table Bandara to add kode column if not exists
-ALTER TABLE Bandara ADD COLUMN IF NOT EXISTS kode VARCHAR(3);
+-- User Data (bcrypt hash example)
+INSERT INTO user (id_user, username, password, level_id) VALUES
+(1, 'admin', '$2y$10$sOmeSaLt.j/8LYqB89/81Oa98uLZJIe09.Xy0/A2d.oJDqQSFQ/S', 1);
 
--- Insert data ke tabel Bandara dengan kode
-INSERT INTO Bandara (nama, kota, negara, kode) VALUES
-('Soekarno-Hatta International Airport', 'Jakarta', 'Indonesia', 'CGK'),
-('Ngurah Rai International Airport', 'Denpasar', 'Indonesia', 'DPS'),
-('Juanda International Airport', 'Surabaya', 'Indonesia', 'SUB'),
-('Kuala Lumpur International Airport', 'Kuala Lumpur', 'Malaysia', 'KUL'),
-('Changi Airport', 'Singapore', 'Singapore', 'SIN'),
-('Kualanamu International Airport', 'Medan', 'Indonesia', 'KNO'),
-('Sultan Hasanuddin International Airport', 'Makassar', 'Indonesia', 'UPG'),
-('Husein Sastranegara International Airport', 'Bandung', 'Indonesia', 'BDO'),
-('Adisucipto International Airport', 'Yogyakarta', 'Indonesia', 'JOG'),
-('Sam Ratulangi International Airport', 'Manado', 'Indonesia', 'MDC');
+-- Bandara Data
+INSERT INTO bandara (id_bandara, nama, kota, negara, kode, timezone) VALUES
+(1, 'Soekarno-Hatta International Airport', 'Jakarta', 'Indonesia', 'CGK', '+07:00'),
+(2, 'Ngurah Rai International Airport', 'Denpasar', 'Indonesia', 'DPS', '+08:00');
 
--- Insert data ke tabel Maskapai
-INSERT INTO Maskapai (nama, logo) VALUES
-('Garuda Indonesia', 'images/airlines/garuda.png'),
-('Lion Air', 'images/airlines/lion.png'),
-('Batik Air', 'images/airlines/batik.png'),
-('Citilink', 'images/airlines/citilink.png');
+-- Customer Data
+INSERT INTO customer (id_customer, first_name, last_name, email, username, password, no_pasport, address, phone_number, nationality, date_of_birth) VALUES
+(1, 'John', 'Doe', 'john.doe@email.com', 'johndoe', '$2y$10$aNotherHash.j/8LYqB89/81Oa98uLZJIe09.Xy0/A2d.oJDqQSFQ/S', 'A12345678', '123 Main St', '123-456-7890', 'American', '1990-01-01'),
+(2, 'Jane', 'Smith', 'jane.smith@email.com', 'janesmith', '$2y$10$yetAnotherHash.j/8LYqB89/81Oa98uLZJIe09.Xy0/A2d.oJDqQSFQ/S', 'B23456789', '456 Oak Ave', '987-654-3210', 'British', '1995-05-05');
 
--- Insert data ke tabel Penerbangan dengan harga dan id_maskapai
-INSERT INTO Penerbangan (nomor_penerbangan, jam_berangkat, jam_kedatangan, asal_penerbangan, tujuan_penerbangan, harga, id_maskapai) VALUES
-('GA-100', '08:00:00', '09:30:00', 1, 2, 1500000, 1),
-('LI-200', '10:00:00', '11:30:00', 2, 3, 1200000, 2),
-('BA-300', '12:00:00', '13:30:00', 3, 4, 2000000, 3),
-('GA-400', '14:00:00', '15:30:00', 4, 5, 2500000, 1),
-('LI-500', '16:00:00', '17:30:00', 5, 1, 1800000, 2),
-('CI-600', '18:00:00', '19:30:00', 1, 6, 1300000, 4),
-('GA-700', '20:00:00', '21:30:00', 6, 7, 1600000, 1),
-('BA-800', '07:00:00', '08:30:00', 7, 8, 1400000, 3),
-('LI-900', '09:00:00', '10:30:00', 8, 9, 1100000, 2),
-('CI-1000', '11:00:00', '12:30:00', 9, 10, 1700000, 4);
 
--- Insert data ke tabel Pemesanan
-INSERT INTO Pemesanan (tanggal_pesan, status, id_customer, id_penerbangan) VALUES
-('2024-12-01', 'Confirmed', 1, 1),
-('2024-12-02', 'Pending', 2, 2),
-('2024-12-03', 'Confirmed', 3, 3),
-('2024-12-04', 'Cancelled', 4, 4),
-('2024-12-05', 'Confirmed', 5, 5);
+
+-- Maskapai Data
+INSERT INTO maskapai (id_maskapai, nama, logo) VALUES
+(1, 'Garuda Indonesia', 'images/airlines/garuda.png'),
+(2, 'Lion Air', 'images/airlines/lion.png');
+
+-- Penerbangan Data
+INSERT INTO penerbangan (id_penerbangan, nomor_penerbangan, jam_berangkat, jam_kedatangan, asal_penerbangan, tujuan_penerbangan, harga, id_maskapai, status, seats_available) VALUES
+(1, 'GA-100', '08:00:00', '09:30:00', 1, 2, 1500000, 1, 'On Time', 150),
+(2, 'LI-200', '10:00:00', '11:30:00', 2, 1, 1200000, 2, 'Delayed', 100);
+
+-- Pemesanan Data
+INSERT INTO pemesanan (id_pemesanan, tanggal_pesan, status, id_customer, id_penerbangan) VALUES
+(1, '2024-12-01', 'Confirmed', 1, 1),
+(2, '2024-12-02', 'Pending', 2, 2);
+
+-- Pembayaran Data
+INSERT INTO pembayaran (id_pembayaran, id_pemesanan, jumlah, tanggal_pembayaran, jenis_pembayaran, status, transaction_id) VALUES
+(1, 1, 1500000, '2024-12-01', 'Kartu Kredit', 'Completed', 'TXN12345'),
+(2, 2, 1200000, '2024-12-02', 'Transfer Bank', 'Pending', 'TXN67890');
+

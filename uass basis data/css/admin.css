@@ -1,0 +1,116 @@
+:root {
+    --primary-color: #0088ff;
+    --sidebar-width: 250px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+.sidenav {
+    height: 100vh;
+    width: var(--sidebar-width);
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: var(--primary-color);
+    overflow-x: hidden;
+    padding-top: 20px;
+    color: white;
+}
+
+.admin-profile {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.admin-profile img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.sidenav a {
+    padding: 12px 15px;
+    text-decoration: none;
+    font-size: 1rem;
+    color: white;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.sidenav a i {
+    margin-right: 10px;
+    width: 20px;
+}
+
+.main {
+    margin-left: var(--sidebar-width);
+    padding: 20px;
+}
+
+.content-header {
+    background-color: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.data-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.data-table {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.action-buttons .btn {
+    padding: 5px 10px;
+    margin: 0 2px;
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-box input {
+    padding-right: 30px;
+    border-radius: 20px;
+}
+
+.search-box i {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
