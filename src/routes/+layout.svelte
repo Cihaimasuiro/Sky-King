@@ -13,15 +13,21 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<nav>
-  <a href="/">Home</a>
-  {#if data.user}
-    <a href="/profile">Profile</a>
-    <button on:click={logout}>Logout</button>
-  {:else}
-    <a href="/login">Login</a>
-    <a href="/register">Register</a>
-  {/if}
-</nav>
+<main class="container">
+  <nav>
+    <ul>
+      <li><a href="/"><strong>Sky King</strong></a></li>
+    </ul>
+    <ul>
+      {#if data.user}
+        <li><a href="/profile">Profile</a></li>
+        <li><button on:click={logout}>Logout</button></li>
+      {:else}
+        <li><a href="/login">Login</a></li>
+        <li><a href="/register">Register</a></li>
+      {/if}
+    </ul>
+  </nav>
 
-{@render children()}
+  {@render children()}
+</main>
