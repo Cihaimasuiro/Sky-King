@@ -28,6 +28,7 @@ wss.on('connection', function connection(ws) {
 					});
 				}
 			}
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		} catch (e) {
 			console.error('Failed to parse message or invalid message format:', data);
 		}

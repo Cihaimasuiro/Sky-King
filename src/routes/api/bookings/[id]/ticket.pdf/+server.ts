@@ -80,7 +80,9 @@ export async function GET({ params, locals }) {
 
 	// QR Code Placeholder
 	doc.rect(doc.page.width - 150, 50, 100, 100).stroke();
-	doc.fontSize(10).text('Scan for details', doc.page.width - 150, 155, { width: 100, align: 'center' });
+	doc
+		.fontSize(10)
+		.text('Scan for details', doc.page.width - 150, 155, { width: 100, align: 'center' });
 	// --- End PDF Content ---
 
 	return new Promise((resolve) => {
@@ -98,4 +100,3 @@ export async function GET({ params, locals }) {
 		doc.end();
 	});
 }
-

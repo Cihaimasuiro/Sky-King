@@ -1,17 +1,11 @@
 <script lang="ts">
-	type Airport = {
-		code: string;
-		city: string;
-		country: string;
-	};
+	import type { Flight as PrismaFlight, Airport } from '@prisma/client';
 
-	type Flight = {
-		id: number;
-		departure: Airport;
-		arrival: Airport;
+	type Flight = Omit<PrismaFlight, 'departureTime' | 'arrivalTime'> & {
 		departureTime: string;
 		arrivalTime: string;
-		price: number;
+		departure: Airport;
+		arrival: Airport;
 	};
 
 	let { flight } = $props<{
@@ -32,7 +26,9 @@
 	});
 </script>
 
-<article class="rounded-lg border border-white/10 bg-white/[0.04] p-5 transition hover:border-white/25">
+<article
+	class="rounded-lg border border-white/10 bg-white/[0.04] p-5 transition hover:border-white/25"
+>
 	<div class="flex items-start justify-between gap-4">
 		<div>
 			<p class="text-sm text-slate-400">{flight.departure.city} to {flight.arrival.city}</p>

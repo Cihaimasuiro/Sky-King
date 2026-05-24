@@ -7,6 +7,15 @@
 		message: string;
 	};
 
+	type Flight = {
+		id: number;
+		departureTime: string;
+	};
+
+	type Booking = {
+		flight: Flight;
+	};
+
 	let notifications = $state<Notification[]>([]);
 	let socket: WebSocket | null = null;
 
@@ -15,9 +24,9 @@
 
 		socket.onopen = () => {
 			// console.log('WebSocket connection established');
-			const upcomingFlightIds = $page.data.bookings
-				?.filter((b) => new Date(b.flight.departureTime) > new Date())
-				.map((b) => b.flight.id);
+			const upcomingFlightIds = ($page.data.bookings as Booking[])
+				?.filter((b: Booking) => new Date(b.flight.departureTime) > new Date())
+				.map((b: Booking) => b.flight.id);
 
 			if (upcomingFlightIds?.length > 0) {
 				socket?.send(JSON.stringify({ type: 'subscribe', flight_ids: upcomingFlightIds }));
@@ -37,6 +46,7 @@
 						notifications = notifications.filter((n) => n.id !== newNotification.id);
 					}, 5000);
 				}
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			} catch (e) {
 				console.error('Failed to parse WebSocket message:', event.data);
 			}

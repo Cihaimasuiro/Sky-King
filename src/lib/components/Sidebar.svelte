@@ -3,12 +3,9 @@
 	import { resolve } from '$app/paths';
 
 	const navigation = [
-		{ name: 'Dashboard', href: '/dashboard' },
+		{ name: 'Dashboard', href: '/' },
 		{ name: 'Search Flights', href: '/search' },
-		{ name: 'My Bookings', href: '/bookings' },
-		{ name: 'Passengers', href: '/passengers' },
-		{ name: 'Payments', href: '/payments' },
-		{ name: 'Settings', href: '/settings' }
+		{ name: 'Profile', href: '/profile' }
 	];
 </script>
 
@@ -19,7 +16,7 @@
 		</div>
 		<div class="flex-1 overflow-y-auto">
 			<nav class="space-y-1 px-2 py-4">
-				{#each navigation as item}
+				{#each navigation as item (item.href)}
 					<a
 						href={resolve(item.href)}
 						class:bg-sky-600={$page.url.pathname === item.href}

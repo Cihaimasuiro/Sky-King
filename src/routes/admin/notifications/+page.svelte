@@ -1,8 +1,9 @@
 <script lang="ts">
-	let message = '';
-	let status = '';
+	let message = $state('');
+	let status = $state('');
 
-	async function sendMessage() {
+	async function sendMessage(event: Event) {
+		event.preventDefault();
 		if (!message) return;
 		status = 'Sending...';
 		try {
@@ -19,6 +20,7 @@
 			socket.onerror = () => {
 				status = 'Error sending message.';
 			};
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		} catch (err) {
 			status = 'Error sending message.';
 		}
@@ -30,7 +32,7 @@
 	<p class="mt-2 text-slate-400">
 		This form sends a message to all connected clients via the WebSocket server.
 	</p>
-	<form on:submit|preventDefault={sendMessage} class="mt-4 space-y-4">
+	<form onsubmit={sendMessage} class="mt-4 space-y-4">
 		<div>
 			<label for="message" class="block text-sm font-medium text-slate-300">Message</label>
 			<input

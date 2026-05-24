@@ -2,6 +2,18 @@
 	import StatCard from '$lib/components/StatCard.svelte';
 	import RecommendationCard from '$lib/components/RecommendationCard.svelte';
 	import { page } from '$app/stores';
+	import type { Booking as PrismaBooking, Passenger, Flight, Airport } from '@prisma/client';
+
+	type BookingWithRelations = Omit<PrismaBooking, 'createdAt'> & {
+		createdAt: string;
+		passengers: Passenger[];
+		flight: Omit<Flight, 'departureTime' | 'arrivalTime'> & {
+			departureTime: string;
+			arrivalTime: string;
+			departure: Airport;
+			arrival: Airport;
+		};
+	};
 
 	let { data } = $props();
 
@@ -17,8 +29,8 @@
 		year: 'numeric'
 	});
 
-	function passengerList(booking) {
-		return booking.passengers.map((p) => p.name).join(', ');
+	function passengerList(booking: BookingWithRelations) {
+		return booking.passengers.map((p: Passenger) => p.name).join(', ');
 	}
 </script>
 
@@ -29,21 +41,13 @@
 	</div>
 
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-		<StatCard
-			label="Total Bookings"
-			value={String(data.stats.bookingCount)}
-			detail="All time"
-		/>
+		<StatCard label="Total Bookings" value={String(data.stats.bookingCount)} detail="All time" />
 		<StatCard
 			label="Total Spend"
 			value={currency.format(data.stats.totalSpend)}
 			detail="All time"
 		/>
-		<StatCard
-			label="Upcoming Flights"
-			value="0"
-			detail="In the next 30 days"
-		/>
+		<StatCard label="Upcoming Flights" value="0" detail="In the next 30 days" />
 	</div>
 
 	{#if data.recommendations.length > 0}
@@ -87,7 +91,7 @@
 									<td class="px-4 py-3 text-right">{currency.format(booking.flight.price)}</td>
 									<td class="px-4 py-3 text-right">
 										<a
-											href={`/api/bookings/${booking.id}/ticket.pdf`}
+											href={resolve(`/api/bookings/${booking.id}/ticket.pdf`)}
 											class="text-sky-300 hover:text-sky-200"
 											download>Download</a
 										>
@@ -113,7 +117,7 @@
 										{shortDate.format(new Date(booking.createdAt))}
 									</p>
 									<a
-										href={`/api/bookings/${booking.id}/ticket.pdf`}
+										href={resolve(`/api/bookings/${booking.id}/ticket.pdf`)}
 										class="text-sm text-sky-300 hover:text-sky-200"
 										download>Download Ticket</a
 									>
@@ -134,12 +138,20 @@
 				<div class="rounded-lg border border-white/10 bg-white/[0.04] p-4">
 					<h3 class="font-semibold text-white">Book a new flight</h3>
 					<p class="text-sm text-slate-400">Find and book a new flight itinerary.</p>
-					<a href="/search" class="mt-4 inline-block rounded-md bg-sky-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-sky-300">Search Flights</a>
+					<a
+						href={resolve('/search')}
+						class="mt-4 inline-block rounded-md bg-sky-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-sky-300"
+						>Search Flights</a
+					>
 				</div>
 				<div class="rounded-lg border border-white/10 bg-white/[0.04] p-4">
 					<h3 class="font-semibold text-white">View your profile</h3>
 					<p class="text-sm text-slate-400">Update your personal information and settings.</p>
-					<a href="/profile" class="mt-4 inline-block rounded-md bg-slate-600 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-500">Go to Profile</a>
+					<a
+						href={resolve('/profile')}
+						class="mt-4 inline-block rounded-md bg-slate-600 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-500"
+						>Go to Profile</a
+					>
 				</div>
 			</div>
 		</div>

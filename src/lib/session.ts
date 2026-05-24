@@ -35,6 +35,7 @@ export function signToken(payload: TokenPayload): string {
 export function verifyToken(token: string): TokenPayload | null {
 	try {
 		return jwt.verify(token, JWT_SECRET) as TokenPayload;
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	} catch (error) {
 		return null;
 	}

@@ -11,7 +11,7 @@ export async function POST({ request }) {
 		return json({ error: 'Missing email or password', code: 400 }, { status: 400 });
 	}
 
-	let user: { id: number; email: string; name: string | null; password } | null =
+	let user: { id: number; email: string; name: string | null; password: string } | null =
 		await prisma.user.findUnique({
 			where: {
 				email

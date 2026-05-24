@@ -79,6 +79,13 @@ export async function POST({ request, locals }) {
 					name,
 					seat: seatFor(index)
 				}))
+			},
+			payment: {
+				create: {
+					amount: flight.price,
+					paymentMethod: 'card', // default for now
+					status: 'confirmed'
+				}
 			}
 		},
 		include: {

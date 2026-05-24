@@ -1,227 +1,202 @@
 # Product Requirements Document (PRD): Project Sky King
-**Version:** 3.0 | **Updated:** May 2026
+
+**Version:** 4.0 | **Updated:** May 2026
 
 ---
 
 ## 1. Executive Summary
 
-**Origin:** Academic database assignment ("Airline Booking") — monolithic PHP + MySQL.  
-**Current State:** Fully migrated to SvelteKit 2 + Svelte 5 + Tailwind 4 + Prisma + MariaDB. Backend auth, API routes, and core booking flow are complete. Desktop layout regression was identified and patched. Advanced feature dependencies (`pdfkit`, `ws`) are installed and ready to implement.  
-**Next Milestone:** Ship the three Phase 4 features (PDF tickets, real-time notifications, flight recommendations) and finalize portfolio-readiness with a proper README and deployment config.
+**Origin:** Academic database assignment ("Airline Booking") — monolithic PHP + MySQL.
+**Current State:** Phase 4 is complete. The app is a fully functional SvelteKit 2 + Svelte 5 + Tailwind 4 + Prisma + MariaDB stack with JWT auth, PDF ticket generation, WebSocket notifications, and a flight recommendation engine. One functional gap remains: the booking flow has no UI — the API exists but users have no page to actually create a booking. The remaining work is Phase 6 (booking UI) and three visual assets to finalize the README.
 
 ---
 
 ## 2. Project Identity & Branding
 
 - **Name:** Sky King — a tribute to aviation enthusiasm (Richard Russell, 2018).
-- **Visual Identity:** Clean, minimalist UI. Accessibility-first, smooth transitions, no clutter.
-- **Target Audience:** Engineering managers and recruiters evaluating SvelteKit, component architecture, API design, and full-stack TypeScript proficiency.
+- **Visual Identity:** Dark theme (`slate-950` base), `sky-400` accent, clean minimalist layout.
+- **Target Audience:** Engineering managers and recruiters evaluating SvelteKit, full-stack TypeScript, and API design proficiency.
 
 ---
 
 ## 3. Tech Stack (Locked)
 
-| Layer | Technology | Version |
-|---|---|---|
-| Frontend | Svelte / SvelteKit | 5.x / 2.x |
-| Styling | Tailwind CSS | 4.x |
-| Backend | SvelteKit API Routes (`+server.ts`) | — |
-| ORM | Prisma | 6.x |
-| Database | MariaDB/MySQL (`uasbasisdata` schema) | — |
-| Auth | JWT + bcrypt | — |
-| PDF | pdfkit | 0.18.x |
-| Real-time | ws (WebSocket) | 8.x |
-
-No stack changes planned. All dependencies are already installed.
+| Layer     | Technology                          | Version   |
+| --------- | ----------------------------------- | --------- |
+| Frontend  | Svelte / SvelteKit                  | 5.x / 2.x |
+| Styling   | Tailwind CSS                        | 4.x       |
+| Backend   | SvelteKit API Routes (`+server.ts`) | —         |
+| ORM       | Prisma                              | 6.x       |
+| Database  | MariaDB/MySQL                       | —         |
+| Auth      | JWT + bcrypt                        | —         |
+| PDF       | pdfkit                              | 0.18.x    |
+| Real-time | ws (standalone `websocket.mjs`)     | 8.x       |
 
 ---
 
-## 4. Feature Status
+## 4. Actual Feature Status (Verified from Source)
 
 ### ✅ Complete
 
-- JWT authentication (login, register, session cookies)
-- Prisma schema mapped to all legacy tables: `users`, `flight`, `booking`, `passengers`, `payment`, `admin`
-- REST API endpoints: `GET /api/flights`, `GET /api/bookings`, `POST /api/bookings`
-- Interactive User Dashboard (total bookings, total spend, booking history)
-- Booking flow with client-side validation
-- Admin panel
-- Desktop two-column layout (sidebar + main content) — fixed in latest push
-- Mobile responsive layout
+- JWT auth: login, register, session cookies, admin role, `hooks.server.ts` middleware
+- Prisma schema: `User`, `Airport`, `Flight`, `Booking`, `Passenger`, `Admin`, `Payment` — all migrated
+- Seed data: 6 airports (CGK, DPS, SIN, HND, ICN, SYD), 5 seeded flights
+- REST API: `GET /api/flights`, `GET /api/bookings`, `POST /api/bookings`, `GET /api/flights/recommended`, `POST /api/login`, `POST /api/register`, `POST /api/logout`
+- PDF ticket: `GET /api/bookings/[id]/ticket.pdf` — pdfkit streaming, boarding pass layout, QR placeholder, `Content-Disposition: attachment`
+- WebSocket: standalone `websocket.mjs` on port 8080, subscription model, per-flight broadcast; `Notifications.svelte` subscribes on load and shows dismissible toasts
+- Admin notification page: `/admin/notifications` — browser sends WS message directly to trigger a status broadcast
+- Recommendation engine: history-based (onward connections from past destinations) with popular-flight fallback; rendered on dashboard and `/search`
+- Dashboard: stats row (total bookings, total spend, upcoming), bookings table with PDF download links, quick actions panel, recommendations carousel
+- Desktop layout: sidebar (`lg:block w-64`) + `lg:pl-64` main offset + fixed header — correctly implemented
+- Mobile layout: sidebar hidden, single-column content
+- JSDoc on `prisma.ts`, `session.ts`, `ticket.pdf/+server.ts`
+- Consistent API error shape: `{ error: string, code: number }` across all routes
+- `.env.example` with `JWT_SECRET` and `DATABASE_URL`
+- README: setup instructions, API table, known limitations
 
-### 🔴 In Progress / Next Sprint (Phase 4)
+### 🔴 Gaps (Not Yet Built)
 
-See Section 6 for full specs.
-
----
-
-## 5. Desktop Layout Contract (Reference — v2.0 fix applied)
-
-This section is the source of truth for layout. **Do not regress these.**
-
-### Breakpoints
-
-| Viewport | Layout |
-|---|---|
-| `< 768px` | Single column, bottom nav bar, compact cards |
-| `768–1023px` | Single column, hamburger menu, no sidebar |
-| `>= 1024px` | Fixed sidebar (`w-64`) + main content (`ml-64 pt-16`) |
-
-### Key Tailwind Constraints
-
-- Navbar: `sticky top-0 z-50 h-16 flex items-center justify-between`
-- Sidebar: `fixed left-0 top-16 h-[calc(100vh-4rem)] w-64` (desktop only, hidden on mobile)
-- Main wrapper: `lg:ml-64 pt-16 min-h-screen px-8 py-6`
-- Content max-width: `max-w-7xl mx-auto` on all pages
+| #   | Gap                                                                                                                                                       | Impact                                          |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| 1   | **No booking UI page** — `POST /api/bookings` exists but there's no `/book` page; `FlightCard.svelte` has an `onselect` prop but no page actually uses it | Users cannot create bookings                    |
+| 2   | **Search form is non-functional** — `/search` has the UI but no query logic; it only shows recommendations                                                | Core user journey broken                        |
+| 3   | **Payment creation missing** — `Payment` table exists but no payment step in booking flow                                                                 | Bookings have no attached payment record        |
+| 4   | **README has 3 `<!-- TODO -->` placeholders** — screenshot, tech stack badges, ERD image                                                                  | Looks unfinished to a recruiter                 |
+| 5   | **PicoCSS loaded alongside Tailwind** in `app.html` — CDN import causes style conflicts                                                                   | Visual inconsistency                            |
+| 6   | **Recommendation logic triplicated** — identical code in `+page.server.ts`, `search/+page.server.ts`, and `/api/flights/recommended`                      | Maintenance burden, inconsistent if one changes |
 
 ---
 
-## 6. Phase 4 Feature Specifications (Completed)
+## 5. Layout Reference (Do Not Regress)
 
-### 6.1 PDF Ticket / Booking Receipt Download ✅
+The current working layout pattern — keep exactly as-is:
 
-**Dependency:** `pdfkit` (already installed)  
-**Route:** `GET /api/bookings/[id]/pdf`  
-**Output:** A downloadable PDF containing:
-- Sky King header / logo mark
-- Booking reference number
-- Passenger name(s) + passport number
-- Flight number, route (origin to destination), departure/arrival times
-- Seat class, total price paid, payment method
-- QR code placeholder (static box is fine for portfolio)
-
-**Frontend trigger:** "Download Ticket" button on `/dashboard/bookings/[id]`.  
-**Implementation notes:**
-- Server-side only — generate in `+server.ts`, stream with `Content-Disposition: attachment; filename="ticket-[id].pdf"`.
-- Pipe `pdfkit` Document to a ReadableStream in the SvelteKit response.
-- No client-side PDF generation.
-
-### 6.2 Real-Time Flight Status Notifications ✅
-
-**Dependency:** `ws` (already installed)  
-**Goal:** Notify logged-in users when a flight they've booked changes status (delayed, gate change, cancelled) without a page reload.
-
-**Architecture:**
 ```
-Admin updates flight status in /admin/flights
-  -> Server broadcasts WS message to all clients subscribed to that flight_id
-  -> Client shows dismissible toast notification
++layout.svelte
+  <div class="min-h-screen bg-slate-950">
+    <Sidebar />                        <!-- hidden on mobile, w-64 block on lg -->
+    <div class="lg:pl-64">
+      <Header />                       <!-- fixed top-0 z-30 h-16 w-full -->
+      <main class="py-16">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {children}
+        </div>
+      </main>
+    </div>
+    <Notifications />
+  </div>
 ```
-
-**WebSocket endpoint:** `GET /api/ws`  
-**Client subscribe message:**
-```json
-{ "type": "subscribe", "flight_ids": [42, 87] }
-```
-**Server broadcast message:**
-```json
-{
-  "type": "flight_status",
-  "flight_id": 42,
-  "status": "delayed",
-  "message": "Flight GA-204 is delayed by 45 minutes."
-}
-```
-**Frontend:** Connect on dashboard load, subscribe to flight IDs from the user's upcoming bookings. Show a toast on message receipt.  
-**Scope note:** Simulated status change from the admin panel is sufficient — no real-time flight data API required.
-
-### 6.3 Flight Recommendation Engine ✅
-
-**Goal:** Surface "Recommended for you" flights on the dashboard and search page based on booking history.
-
-**Logic (server-side heuristic, no ML needed):**
-1. Extract all past destination airports from the user's bookings.
-2. Find available flights departing from those destinations (onward connections).
-3. Boost flights to cities the user has visited more than once.
-4. Fallback: return top 3 flights by available seat count if no history exists.
-
-**API endpoint:** `GET /api/flights/recommended` (auth required)  
-**Response:** Array of up to 4 flight objects, each with an added `reason` string (e.g. "You've flown to Bali before").  
-**Frontend:** Render as a horizontal "Recommended" card row on `/dashboard` and as a highlighted section at the top of `/search`.
 
 ---
 
-## 7. Phase 5 — Portfolio Finalization (After Phase 4)
+## 6. Phase 6 — Booking Flow (Current Priority)
 
-Low effort, high impact. Makes the repo actually readable to a recruiter.
+This is the most important remaining work. The API is ready; only the UI is missing.
 
-### 7.1 README Overhaul
+### 6.1 Flight Detail + Booking Page `/flights/[id]`
 
-Replace the default SvelteKit scaffold README with:
+**Route:** `/flights/[id]`
+**Load function:** `GET /api/flights` or direct Prisma query for the single flight by `params.id`.
+**Page content:**
 
-- Project name + one-line pitch
-- Screenshot or short GIF of the dashboard at desktop breakpoint
-- Tech stack badges
-- Local setup block:
-  ```bash
-  git clone https://github.com/Cihaimasuiro/Sky-King
-  cd Sky-King
-  npm install
-  cp .env.example .env        # fill in DB_URL, JWT_SECRET
-  npx prisma migrate deploy
-  npm run dev
-  ```
-- API endpoint reference table (method, route, auth required, description)
-- ERD diagram image (export from existing ERD)
-- Known limitations / future improvements section
+- Flight summary card (reuse `FlightCard.svelte` with `onselect` removed, showing full detail)
+- Passenger form: add/remove passenger name inputs (minimum 1)
+- "Book Flight" submit button → `POST /api/bookings` with `{ flightId, passengerNames: string[] }`
+- On success: redirect to `/` (dashboard) with a success banner
 
-### 7.2 Environment & Deployment
+**Link from:** `FlightCard.svelte` "Book this flight" button should navigate to `/flights/{flight.id}` instead of calling `onselect`. Update `FlightCard.svelte` accordingly.
 
-- Add `.env.example` with all required keys documented (no real values).
-- Add a note on the MariaDB vs MySQL `DATABASE_URL` format difference.
-- Optional: Dockerfile or a Railway/Vercel deploy note so reviewers can run it without a local database.
+### 6.2 Wire Up Search
 
-### 7.3 Code Quality Pass
+**Route:** `/search`
+**Current state:** Form exists, does nothing.
+**Required change:** On form submit, call `GET /api/flights` and filter client-side (or add query params to the API). Display matching `FlightCard` components with links to `/flights/[id]`.
 
-- Remove all `console.log` debug statements from production paths.
-- Ensure all API routes return consistent error shapes: `{ error: string, code: number }`.
-- Add JSDoc/TSDoc comments to the three main server utilities: auth helper, Prisma client singleton, PDF generator.
+Minimal viable implementation — no backend changes needed:
+
+1. On mount, load all flights via `+page.server.ts` (already pattern-matched in the rest of the app).
+2. Filter by departure city/code and arrival city/code using reactive state.
+3. Render filtered results as `FlightCard` list below the form.
+
+### 6.3 Payment Step (Minimal)
+
+The `Payment` table exists in the DB. After a booking is created, insert a payment record automatically with `status: 'pending'` and the flight price as `amount`. This can be done inside `POST /api/bookings` without a separate payment page — the user can be told "payment confirmed" for portfolio purposes.
+
+Add to `POST /api/bookings` after booking creation:
+
+```typescript
+await prisma.payment.create({
+	data: {
+		bookingId: booking.id,
+		amount: flight.price,
+		paymentMethod: 'card', // default for now
+		status: 'confirmed'
+	}
+});
+```
 
 ---
 
-## 8. Full Page & Route Inventory
+## 7. Phase 7 — Final Polish
 
-| Route | Page | Auth |
-|---|---|---|
-| `/` | Landing / Hero | Public |
-| `/login` | Login | Public |
-| `/register` | Register | Public |
-| `/search` | Flight Search + Recommended section | Public |
-| `/flights/[id]` | Flight Detail | Public |
-| `/booking/[id]` | Booking Flow (passenger form + payment) | User |
-| `/dashboard` | User Dashboard (stats + recommendations) | User |
-| `/dashboard/bookings` | Booking History | User |
-| `/dashboard/bookings/[id]` | Booking Detail + PDF Download button | User |
-| `/dashboard/profile` | Profile & Settings | User |
-| `/admin` | Admin Dashboard | Admin |
-| `/admin/flights` | Flight Management (triggers WS notifications) | Admin |
-| `/admin/bookings` | Booking Management | Admin |
-| `GET /api/flights` | All available flights | Public |
-| `GET /api/flights/recommended` | Personalized recommendations | User |
-| `GET /api/bookings` | User's booking list | User |
-| `POST /api/bookings` | Create booking | User |
-| `GET /api/bookings/[id]/pdf` | Stream booking PDF | User |
-| `POST /api/auth/login` | Login | Public |
-| `POST /api/auth/register` | Register | Public |
-| `GET /api/ws` | WebSocket connection | User |
+### 7.1 README Assets (3 remaining TODOs)
+
+- **Screenshot:** Take a screenshot of the dashboard at 1440px width; save as `static/screenshot.png`; replace `<!-- TODO -->` in README.
+- **Tech stack badges:** Add shields.io badges for SvelteKit, Prisma, Tailwind, TypeScript, MariaDB.
+- **ERD:** Export the Prisma schema as a diagram (use `prisma-erd-generator` or draw manually); save as `static/erd.png`; replace `<!-- TODO -->` in README.
+
+### 7.2 Remove PicoCSS
+
+In `src/app.html`, remove the PicoCSS CDN `<link>` tag. It conflicts with Tailwind's reset and causes inconsistent button/form styling. Tailwind handles everything already.
+
+### 7.3 Extract Recommendation Logic
+
+Create `src/lib/recommendations.ts` with a single exported async function `getRecommendations(userId: number)`. Replace the three copy-pasted implementations in `+page.server.ts`, `search/+page.server.ts`, and `/api/flights/recommended/+server.ts` with a single import. Also delete the now-redundant `/api/recommendations/+server.ts`.
+
+---
+
+## 8. Full Route Inventory (Current Reality)
+
+| Route                               | Status                                                | Auth   |
+| ----------------------------------- | ----------------------------------------------------- | ------ |
+| `/`                                 | ✅ Dashboard (stats, bookings table, recommendations) | User   |
+| `/login`                            | ✅ Login form                                         | Public |
+| `/register`                         | ✅ Register form                                      | Public |
+| `/profile`                          | ✅ Profile display                                    | User   |
+| `/search`                           | 🔴 Recommendations only — search non-functional       | Public |
+| `/flights/[id]`                     | 🔴 Does not exist                                     | —      |
+| `/admin/notifications`              | ✅ WS broadcast trigger                               | Admin  |
+| `GET /api/flights`                  | ✅                                                    | Public |
+| `GET /api/flights/recommended`      | ✅                                                    | User   |
+| `GET /api/bookings`                 | ✅                                                    | User   |
+| `POST /api/bookings`                | ✅                                                    | User   |
+| `GET /api/bookings/[id]/ticket.pdf` | ✅                                                    | User   |
+| `GET /api/recommendations`          | ⚠️ Duplicate of /api/flights/recommended              | User   |
+| `POST /api/login`                   | ✅                                                    | Public |
+| `POST /api/register`                | ✅                                                    | Public |
+| `POST /api/logout`                  | ✅                                                    | Public |
+| `ws://localhost:8080`               | ✅ Standalone websocket.mjs                           | —      |
 
 ---
 
 ## 9. Roadmap Summary
 
-| Phase | Status | Description |
-|---|---|---|
-| 1 — Backend & DB | Done | Prisma + MariaDB + JWT auth + API routes |
-| 2 — Frontend Scaffold | Done | SvelteKit + Tailwind + components + booking flow |
-| 3 — Desktop Layout Fix | Done | Sidebar, navbar, grid layout corrected |
-| 4 — Advanced Features | Done | PDF tickets, WebSocket notifications, recommendations |
-| | 5 — Portfolio Polish | Done | README overhaul, .env.example, code cleanup | |
+| Phase                 | Status            | Description                                           |
+| --------------------- | ----------------- | ----------------------------------------------------- | ---------------------------------------------------------- | --- |
+| 1 — Backend & DB      | ✅ Done           | Prisma + MariaDB + JWT auth + API routes              |
+| 2 — Frontend Scaffold | ✅ Done           | SvelteKit + Tailwind + components + dashboard         |
+| 3 — Desktop Layout    | ✅ Done           | Sidebar + fixed header + pl-64 offset                 |
+| 4 — Advanced Features | ✅ Done           | PDF tickets, WebSocket notifications, recommendations |
+| 5 — Portfolio Polish  | ✅ Done           | README, .env.example, JSDoc, error shapes             |
+| 6 — Booking Flow      | ✅ Done           | Flight detail page, wired search, payment record      |
+|                       | 7 — Final Cleanup | ✅ Done                                               | README assets, remove PicoCSS, deduplicate recommendations |     |
 
 ---
 
-## 10. Success Metrics
+## 10. Success Criteria
 
-- All Phase 4 features functional end-to-end with no console errors.
-- Desktop Lighthouse score >= 90 (Performance, Accessibility, Best Practices).
-- README allows a new reviewer to clone and run locally in under 5 minutes.
-- Zero layout regressions at 1280px, 1440px, and 1920px viewport widths.
+- A logged-in user can search flights, open a flight detail page, add passenger names, and confirm a booking end-to-end.
+- The booking appears in the dashboard table immediately after creation.
+- A PDF download link for the new booking works on first click.
+- README has no `<!-- TODO -->` comments and renders cleanly on GitHub.
+- `npm run lint` passes with zero warnings.

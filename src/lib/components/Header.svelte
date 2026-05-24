@@ -21,7 +21,10 @@
 
 	<div class="flex items-center gap-3 text-sm">
 		{#if $page.data.user}
-			<button class="i-lucide-bell h-5 w-5 text-slate-400 hover:text-white"></button>
+			<button
+				class="i-lucide-bell h-5 w-5 text-slate-400 hover:text-white"
+				aria-label="Notifications"
+			></button>
 			<a class="rounded-md px-3 py-2 text-slate-200 hover:bg-white/10" href={resolve('/profile')}
 				>Profile</a
 			>

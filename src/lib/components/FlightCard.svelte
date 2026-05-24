@@ -1,27 +1,21 @@
 <script lang="ts">
-	type Airport = {
-		code: string;
-		city: string;
-		country: string;
-	};
+	import type { Flight as PrismaFlight, Airport } from '@prisma/client';
 
-	type Flight = {
-		id: number;
-		departure: Airport;
-		arrival: Airport;
+	type Flight = Omit<PrismaFlight, 'departureTime' | 'arrivalTime'> & {
 		departureTime: string;
 		arrivalTime: string;
-		price: number;
+		departure: Airport;
+		arrival: Airport;
 	};
 
 	let {
 		flight,
 		selected = false,
-		onselect
+		showBookButton = true
 	} = $props<{
 		flight: Flight;
 		selected?: boolean;
-		onselect?: (flight: Flight) => void;
+		showBookButton?: boolean;
 	}>();
 
 	const currency = new Intl.NumberFormat('en-US', {
@@ -65,14 +59,19 @@
 		</p>
 	</div>
 
-	{#if onselect}
-		<button
-			class="mt-5 w-full rounded-md bg-white px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-sky-100 disabled:opacity-70"
-			type="button"
-			onclick={() => onselect?.(flight)}
-			disabled={selected}
+	{#if showBookButton}
+		<a
+			href={resolve(`/flights/${flight.id}`)}
+			class="mt-5 block w-full rounded-md bg-white px-4 py-2 text-center text-sm font-semibold text-slate-950 hover:bg-sky-100"
 		>
-			{selected ? 'Selected' : 'Book this flight'}
-		</button>
+			Book this flight
+		</a>
+	{:else}
+		<a
+			href={resolve(`/flights/${flight.id}`)}
+			class="mt-5 block w-full rounded-md bg-white px-4 py-2 text-center text-sm font-semibold text-slate-950 hover:bg-sky-100"
+		>
+			View Details
+		</a>
 	{/if}
 </article>
