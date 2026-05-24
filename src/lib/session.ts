@@ -1,17 +1,20 @@
-import { randomBytes } from 'crypto';
+import jwt from 'jsonwebtoken';
 
-const sessions = new Map<string, number>();
+import { JWT_SECRET } from '$env/static/private';
 
-export function createSession(userId: number) {
-  const sessionId = randomBytes(16).toString('hex');
-  sessions.set(sessionId, userId);
-  return sessionId;
+interface TokenPayload {
+	userId: number;
+	role: 'USER' | 'ADMIN';
 }
 
-export function getUserIdFromSession(sessionId: string) {
-  return sessions.get(sessionId);
+export function signToken(payload: TokenPayload): string {
+	return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 }
 
-export function removeSession(sessionId: string) {
-  sessions.delete(sessionId);
+export function verifyToken(token: string): TokenPayload | null {
+	try {
+		return jwt.verify(token, JWT_SECRET) as TokenPayload;
+	} catch (error) {
+		return null;
+	}
 }
