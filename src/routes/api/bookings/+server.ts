@@ -9,7 +9,7 @@ function seatFor(index: number) {
 
 export async function GET({ locals }) {
 	if (!locals.user) {
-		return json({ message: 'Authentication required' }, { status: 401 });
+		return json({ error: 'Authentication required', code: 401 }, { status: 401 });
 	}
 
 	const bookings = await prisma.booking.findMany({
@@ -45,7 +45,7 @@ export async function GET({ locals }) {
 
 export async function POST({ request, locals }) {
 	if (!locals.user) {
-		return json({ message: 'Authentication required' }, { status: 401 });
+		return json({ error: 'Authentication required', code: 401 }, { status: 401 });
 	}
 
 	const { flightId, passengerNames } = await request.json();
@@ -54,7 +54,10 @@ export async function POST({ request, locals }) {
 		: [];
 
 	if (!Number.isInteger(flightId) || names.length === 0) {
-		return json({ message: 'Select a flight and add at least one passenger' }, { status: 400 });
+		return json(
+			{ error: 'Select a flight and add at least one passenger', code: 400 },
+			{ status: 400 }
+		);
 	}
 
 	const flight = await prisma.flight.findUnique({
@@ -64,7 +67,7 @@ export async function POST({ request, locals }) {
 	});
 
 	if (!flight) {
-		return json({ message: 'Flight not found' }, { status: 404 });
+		return json({ error: 'Flight not found', code: 404 }, { status: 404 });
 	}
 
 	const booking = await prisma.booking.create({

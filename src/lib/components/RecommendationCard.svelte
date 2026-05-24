@@ -52,4 +52,5 @@
 			<span class="text-slate-500">Arrives</span><br />{time.format(new Date(flight.arrivalTime))}
 		</p>
 	</div>
+	<slot />
 </article>

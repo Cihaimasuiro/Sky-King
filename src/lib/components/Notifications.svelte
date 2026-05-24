@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 
 	type Notification = {
 		id: number;
@@ -13,22 +14,36 @@
 		socket = new WebSocket('ws://localhost:8080');
 
 		socket.onopen = () => {
-			console.log('WebSocket connection established');
+			// console.log('WebSocket connection established');
+			const upcomingFlightIds = $page.data.bookings
+				?.filter((b) => new Date(b.flight.departureTime) > new Date())
+				.map((b) => b.flight.id);
+
+			if (upcomingFlightIds?.length > 0) {
+				socket?.send(JSON.stringify({ type: 'subscribe', flight_ids: upcomingFlightIds }));
+			}
 		};
 
 		socket.onmessage = (event) => {
-			const newNotification = {
-				id: Date.now(),
-				message: event.data
-			};
-			notifications = [...notifications, newNotification];
-			setTimeout(() => {
-				notifications = notifications.filter((n) => n.id !== newNotification.id);
-			}, 5000);
+			try {
+				const data = JSON.parse(event.data);
+				if (data.type === 'flight_status') {
+					const newNotification = {
+						id: Date.now(),
+						message: data.message
+					};
+					notifications = [...notifications, newNotification];
+					setTimeout(() => {
+						notifications = notifications.filter((n) => n.id !== newNotification.id);
+					}, 5000);
+				}
+			} catch (e) {
+				console.error('Failed to parse WebSocket message:', event.data);
+			}
 		};
 
 		socket.onclose = () => {
-			console.log('WebSocket connection closed');
+			// console.log('WebSocket connection closed');
 		};
 
 		return () => {

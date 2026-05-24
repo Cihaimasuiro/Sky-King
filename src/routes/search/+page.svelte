@@ -1,3 +1,9 @@
+<script lang="ts">
+	import RecommendationCard from '$lib/components/RecommendationCard.svelte';
+
+	let { data } = $props();
+</script>
+
 <div class="mx-auto max-w-2xl">
 	<h1 class="text-2xl font-bold text-white">Search Flights</h1>
 	<form class="mt-4 space-y-4">
@@ -34,4 +40,19 @@
 			</button>
 		</div>
 	</form>
+
+	{#if data.recommendations.length > 0}
+		<div class="mt-8 space-y-4">
+			<h2 class="text-lg font-medium text-white">Recommended for You</h2>
+			<div class="flex space-x-4 overflow-x-auto pb-4">
+				{#each data.recommendations as flight (flight.id)}
+					<div class="w-80 flex-shrink-0">
+						<RecommendationCard {flight}>
+							<p class="mt-2 text-xs text-sky-200">{flight.reason}</p>
+						</RecommendationCard>
+					</div>
+				{/each}
+			</div>
+		</div>
+	{/if}
 </div>

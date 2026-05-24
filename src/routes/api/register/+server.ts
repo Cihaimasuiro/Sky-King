@@ -6,7 +6,7 @@ export async function POST({ request }) {
 	const { name, email, password } = await request.json();
 
 	if (!name || !email || !password) {
-		return json({ message: 'Missing name, email, or password' }, { status: 400 });
+		return json({ error: 'Missing name, email, or password', code: 400 }, { status: 400 });
 	}
 
 	const saltRounds = 10;
@@ -22,6 +22,6 @@ export async function POST({ request }) {
 		});
 		return json({ message: 'User created successfully', user }, { status: 201 });
 	} catch {
-		return json({ message: 'User with this email already exists' }, { status: 409 });
+		return json({ error: 'User with this email already exists', code: 409 }, { status: 409 });
 	}
 }

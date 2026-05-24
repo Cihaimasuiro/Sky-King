@@ -1,5 +1,6 @@
 <script lang="ts">
 	import StatCard from '$lib/components/StatCard.svelte';
+	import RecommendationCard from '$lib/components/RecommendationCard.svelte';
 	import { page } from '$app/stores';
 
 	let { data } = $props();
@@ -44,6 +45,21 @@
 			detail="In the next 30 days"
 		/>
 	</div>
+
+	{#if data.recommendations.length > 0}
+		<div class="space-y-4">
+			<h2 class="text-lg font-medium text-white">Recommended for You</h2>
+			<div class="flex space-x-4 overflow-x-auto pb-4">
+				{#each data.recommendations as flight (flight.id)}
+					<div class="w-80 flex-shrink-0">
+						<RecommendationCard {flight}>
+							<p class="mt-2 text-xs text-sky-200">{flight.reason}</p>
+						</RecommendationCard>
+					</div>
+				{/each}
+			</div>
+		</div>
+	{/if}
 
 	<div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
 		<div class="lg:col-span-3">

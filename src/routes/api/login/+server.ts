@@ -8,7 +8,7 @@ export async function POST({ request }) {
 	const { email, password } = await request.json();
 
 	if (!email || !password) {
-		return json({ message: 'Missing email or password' }, { status: 400 });
+		return json({ error: 'Missing email or password', code: 400 }, { status: 400 });
 	}
 
 	let user: { id: number; email: string; name: string | null; password } | null =
@@ -33,13 +33,13 @@ export async function POST({ request }) {
 	}
 
 	if (!user) {
-		return json({ message: 'Invalid email or password' }, { status: 401 });
+		return json({ error: 'Invalid email or password', code: 401 }, { status: 401 });
 	}
 
 	const passwordMatch = await bcrypt.compare(password, user.password);
 
 	if (!passwordMatch) {
-		return json({ message: 'Invalid email or password' }, { status: 401 });
+		return json({ error: 'Invalid email or password', code: 401 }, { status: 401 });
 	}
 
 	const token = signToken({ userId: user.id, role });
