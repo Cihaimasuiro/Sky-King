@@ -34,7 +34,7 @@
 		"postcss": "^8.5.15",
 		"prettier": "^3.8.1",
 		"prettier-plugin-svelte": "^3.5.1",
-		"prisma": "^7.8.0",
+		"prisma": "^6.19.3",
 		"svelte": "^5.55.2",
 		"svelte-check": "^4.4.6",
 		"tailwindcss": "^4.3.0",
@@ -44,7 +44,7 @@
 	},
 	"dependencies": {
 		"@prisma/adapter-mariadb": "^7.8.0",
-		"@prisma/client": "^7.8.0",
+		"@prisma/client": "^6.19.3",
 		"@types/jsonwebtoken": "^9.0.10",
 		"@types/pdfkit": "^0.17.6",
 		"@types/ws": "^8.18.1",
